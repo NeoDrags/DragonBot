@@ -10,7 +10,13 @@ client = Bot(command_prefix ="$")
 
 @client.event
 async def on_ready():
+    game = discord.Game("Ready to roar!")
+    await client.change_presence(status=discord.Status.online, activity=game)
     print("Connected to Discord as: " + client.user.name)
+
+@client.command()
+async def ping(ctx):
+    await ctx.send(f":table_tennis: smashed at you wih a ping of {client.latency}")
 
 @client.command()
 async def verify(message):
@@ -21,7 +27,6 @@ async def verify(message):
 
 @client.command()
 async def say(message, * , text):
-    await message.delete()
     await message.channel.send(f"{text}")
 
 print("Running the bot...")
