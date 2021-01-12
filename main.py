@@ -20,7 +20,7 @@ async def ping(ctx):
     '''
     Gets the latency of the bot
     '''
-    await ctx.send(f":table_tennis: smashed at you wih a ping of {client.latency} ms")
+    await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 100, 1)))
 
 f = open('badword.json')
 arr = json.load(f)
