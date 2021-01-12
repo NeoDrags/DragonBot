@@ -23,11 +23,14 @@ async def ping(ctx):
     await ctx.send(f":table_tennis: smashed at you wih a ping of {client.latency} ms")
 
 f = open('badword.json')
-arr = json.load(f)["BadWords"]
+arr = json.load(f)
 
-# @client.event
-# async def onSwear(message):
-    
+@client.event
+async def onSwear(ctx):
+    for i in arr['BadWords']:
+        if i in ctx.message.content:
+            await ctx.message.delete()
+            await ctx.send(f"**{ctx.message.author} has been warned he has sworn**")
 
 @client.command()
 async def verify(message):
