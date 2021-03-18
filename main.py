@@ -49,7 +49,7 @@ async def say(ctx, * , text):
     '''
     Echos what you say
     '''
-    if(ctx.author.id == owner):
+    if(str(ctx.author.id) == str(owner)):
         await ctx.message.delete()
         await ctx.send(f"{text}")
 
