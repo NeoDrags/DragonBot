@@ -9,6 +9,8 @@ load_dotenv()
 
 client = Bot(command_prefix ="$")
 
+owner = os.getenv("OWNER")
+
 @client.event
 async def on_ready():
     game = discord.Game("Ready to roar!")
@@ -47,8 +49,10 @@ async def say(ctx, * , text):
     '''
     Echos what you say
     '''
-    await ctx.message.delete()
-    await ctx.send(f"{text}")
+    if(ctx.author.id == owner):
+        await ctx.message.delete()
+        await ctx.send(f"{text}")
+
 
 print("Running the bot...")
 try:
