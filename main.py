@@ -29,9 +29,6 @@ arr = json.load(f)
 
 @client.event
 async def help(message):
-    if message.author == client.user:
-        return
-
     e = discord.Embed()
     e.add_field(name = "Commands that you can execute", value = """here are the commands that you can type they are :
                     1) Type *$verify* to verify yourself
