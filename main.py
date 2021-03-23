@@ -22,10 +22,23 @@ async def ping(ctx):
     '''
     Gets the latency of the bot
     '''
-    await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 100, 1)))
+    await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 1000, 1)))
 
 f = open('badword.json')
 arr = json.load(f)
+
+@client.event
+async def help(message):
+    if message.author == client.user:
+        return
+
+    e = discord.Embed()
+    e.add_field(name = "Commands that you can execute", value = """here are the commands that you can type they are :
+                    1) Type *$verify* to verify yourself
+                    2) Type *$help* to execute this command which will display the commands that you can execute
+                    3) Type *$ping* to get the ping of the bot
+                    4) Type *$toss* to perform a coin toss""" , inline = False)
+    await message.channel.send(embed=e)
 
 @client.event
 async def onSwear(ctx):
