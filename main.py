@@ -27,7 +27,7 @@ async def ping(ctx):
 f = open('badword.json')
 arr = json.load(f)
 
-@client.event
+@client.command()
 async def help(message):
     e = discord.Embed()
     e.add_field(name = "Commands that you can execute", value = """here are the commands that you can type they are :
