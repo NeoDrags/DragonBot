@@ -22,13 +22,13 @@ async def on_ready():
 async def status_task():
     while True:
         await client.change_presence(activity=discord.Game(name="Soaring High in Servers!"))
-        await asyncio.sleep(3)
+        await asyncio.sleep(6)
         await client.change_presence(activity=discord.Game(name= f"In {len(client.guilds)} servers"))
-        await asyncio.sleep(3)
+        await asyncio.sleep(6)
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.competing, name=f"Trying to be the Best Bot"))
-        await asyncio.sleep(3)
+        await asyncio.sleep(6)
         await client.change_presence(activity=discord.Game(name = "Being trained by My Master NeoDrags"))
-        await asyncio.sleep(3)
+        await asyncio.sleep(6)
 
 @client.command()
 async def ping(ctx):
@@ -47,10 +47,14 @@ async def help(message):
     )
     e.set_author(name= "Help")
     e.add_field(name = "Commands that you can execute", value = """Here are the commands that you can type they are :
-                        1) Type *$verify* to verify yourself
+                        1) Type *$verify* to verify yourself But this only works if you have a Members role (no spelling mistakes)
                         2) Type *$help* to execute this command which will display the commands that you can execute
                         3) Type *$ping* to get the ping of the bot
-                        4) Type *$toss* to perform a coin toss""" , inline = False)
+                        4) Type *$toss* to perform a coin toss
+                        5) Type *$add* to add two numbers
+                        6) Type *$subtract* to subtract two numbers
+                        7) Type *$multiply* to multiply two numbers
+                        8) Type *$divide* to divide two numbers""" , inline = False)
     await message.channel.send(embed=e)
 
 @client.command()
@@ -69,12 +73,6 @@ async def toss(message):
         e.set_image(url = "https://www.pngjoy.com/pngm/146/2933990_quarter-tails-on-a-coin-transparent-png.png")
     await message.channel.send(embed = e)
 
-@client.event
-async def onSwear(ctx):
-    for i in arr['BadWords']:
-        if i in ctx.message.content:
-            await ctx.message.delete()
-            await ctx.send(f"**{ctx.message.author} has been warned he has sworn**")
 
 @client.command()
 async def verify(message):
@@ -95,6 +93,21 @@ async def say(ctx, * , text):
         await ctx.message.delete()
         await ctx.send(f"{text}")
 
+@client.command()
+async def add(ctx, num1:int, num2:int):
+    await ctx.send(f"Sum is: {num1 + num2}")
+
+@client.command()
+async def subtract(ctx, num1:int, num2:int):
+    await ctx.send(f"Difference is: {num1 - num2}")
+
+@client.command()
+async def multiply(ctx, num1:int, num2:int):
+    await ctx.send(f"Product is: {num1 * num2}")
+
+@client.command()
+async def divide(ctx, num1:int, num2:int):
+    await ctx.send(f"Result is: {num1 / num2}")
 
 print("Running the bot...")
 try:
