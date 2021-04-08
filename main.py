@@ -9,7 +9,7 @@ import json
 
 load_dotenv()
 
-client = Bot(command_prefix ="$")
+client = Bot(command_prefix ="$", case_insensitive = True)
 client.remove_command('help')
 
 owner = os.getenv("OWNER")
@@ -37,25 +37,39 @@ async def ping(ctx):
     '''
     await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 1000, 1)))
 
-f = open('badword.json')
-arr = json.load(f)
+f = open("names.txt", "w")
+
 
 @client.command()
-async def help(message):
-    e = discord.Embed(
-        color = discord.Colour.dark_purple()
-    )
-    e.set_author(name= "Help")
-    e.add_field(name = "Commands that you can execute", value = """Here are the commands that you can type they are :
-                        1) Type *$verify* to verify yourself But this only works if you have a Members role (no spelling mistakes)
-                        2) Type *$help* to execute this command which will display the commands that you can execute
-                        3) Type *$ping* to get the ping of the bot
-                        4) Type *$toss* to perform a coin toss
-                        5) Type *$add* to add two numbers
-                        6) Type *$subtract* to subtract two numbers
-                        7) Type *$multiply* to multiply two numbers
-                        8) Type *$divide* to divide two numbers""" , inline = False)
-    await message.channel.send(embed=e)
+async def help(message, arg=None):
+    if(arg == "mod"):
+        e = discord.Embed(
+            color = discord.Color.random(),
+            title = "Mod Commands"
+        )
+        e.set_thumbnail(url="https://images-ext-2.discordapp.net/external/ToRp80b4LrArOZXM4tA6UMMpgfS1PZMQer5TehaRAi4/%3Fid%3DOIP.NJm0nFz7IBTZk2YQ2wJE9QHaHD%26pid%3DApi%26P%3D0%26w%3D164%26h%3D157/https/tse2.mm.bing.net/th")
+        e.add_field(name="**Moderation**", value="""
+        `$verify` for verification""")
+        await message.channel.send(embed=e)
+    else:
+        e = discord.Embed(
+            color = discord.Color.random(),
+            title = "Welcome to my cave. I was once a Dragon..."
+        )
+        e.set_thumbnail(url= "https://image.freepik.com/free-vector/blue-robot-dragon-sticker_85893-72.jpg")
+        e.add_field(name = "**Here is what you can do**", value = """
+                            *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   * 
+                            **:tools:  Moderation**
+                                `$help mod`
+                           
+                            **:fireworks:  fun**
+                                `$help fun`
+
+                            **:
+
+                            """ , inline = False)
+        e.set_author(name=f"Requested by {message.author.name}", icon_url=message.author.avatar_url)
+        await message.channel.send(embed=e)
 
 @client.command()
 async def toss(message):
