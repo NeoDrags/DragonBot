@@ -14,6 +14,11 @@ client.remove_command('help')
 
 owner = os.getenv("OWNER")
 
+with open("servers.json") as f:
+    serversAndMembers = json.load(f)
+
+print(serversAndMembers)
+
 @client.event
 async def on_ready():
     client.loop.create_task(status_task())
@@ -36,9 +41,6 @@ async def ping(ctx):
     Gets the latency of the bot
     '''
     await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 1000, 1)))
-
-f = open("names.txt", "w")
-
 
 @client.command()
 async def help(message, arg=None):
@@ -65,7 +67,8 @@ async def help(message, arg=None):
                             **:fireworks:  fun**
                                 `$help fun`
 
-                            **:
+                            **:heavy_plus_sign: maths**
+                                `$help
 
                             """ , inline = False)
         e.set_author(name=f"Requested by {message.author.name}", icon_url=message.author.avatar_url)
@@ -97,6 +100,16 @@ async def verify(message):
     role = discord.utils.get(message.guild.roles, name = "Members")
     await member.add_roles(role)
     await message.channel.send(f"{member.name} has been verified")
+
+@client.command()
+async def setVerifyRole(message, arg):
+    if(str(message.guild.name) in serversAndMembers):
+        if(str(arg) in serversAndMembers.values()):
+            message.channel.send("Error this is already present in the server")
+        else:
+            serversAndMembers[str(message.guild.name)] = str(arg)
+    else:
+            serversAndMembers[str(message.guild.name)] = str(arg)
 
 @client.command()
 async def say(ctx, * , text):
