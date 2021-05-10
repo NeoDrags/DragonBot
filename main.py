@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import discord
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, has_permissions
 from discord.utils import get
 import os
 import asyncio
@@ -37,9 +37,6 @@ async def status_task():
 
 @client.command()
 async def ping(ctx):
-    '''
-    Gets the latency of the bot
-    '''
     await ctx.send(':table_tennis: smashed at you with a ping of {} ms'.format(round(client.latency * 1000, 1)))
 
 @client.command()
@@ -91,31 +88,92 @@ async def toss(message):
     await message.channel.send(embed = e)
 
 
-@client.command()
-async def verify(message):
-    '''
-    Verifies you NOTE: This only works if you have a role name called Members with no aliteration in spelling or name
-    '''
-    member = message.author
-    role = discord.utils.get(message.guild.roles, name = "Members")
-    await member.add_roles(role)
-    await message.channel.send(f"{member.name} has been verified")
+@client.command(pass_context=True)
+async def verify(ctx, member = discord.Member, role = discord.Role):
+    with open("servers.json") as f:
+        serversAndMembers = json.load(f)
+        roleName = serversAndMembers.get(str(ctx.guild))
+        Verification_role = get(ctx.message.guild.roles, name = roleName)
+        if(Verification_role in member.roles):
+            await ctx.send("You are already verified")
+        else:
+            await member.add_roles(role)
+            await ctx.send(f"{member.name} has been verified")
 
 @client.command()
+@has_permissions(administrator = True)
 async def setVerifyRole(message, arg):
+    guild = message.guild
     if(str(message.guild.name) in serversAndMembers):
         if(str(arg) in serversAndMembers.values()):
-            message.channel.send("Error this is already present in the server")
+            await message.channel.send("Error this is already present in the server")
         else:
-            serversAndMembers[str(message.guild.name)] = str(arg)
+            roles = await guild.fetch_roles()
+            role = discord.utils.get(message.guild.roles, name = str(arg))
+            if(str(arg in roles)):
+                accept_decline = await message.channel.send("This role is not present in the server, do you want me to create it?")
+                thumbsUp = "\N{THUMBS UP SIGN}"
+                thumbsDown = "\N{THUMBS DOWN SIGN}"
+                await accept_decline.add_reaction(thumbsUp)
+                await accept_decline.add_reaction(thumbsDown)
+                def check(reaction, user):
+                    return user == message.author and str(reaction.emoji) in ['\N{THUMBS UP SIGN}' , '\N{THUMBS DOWN SIGN}']
+                try:
+                    reaction, user= await client.wait_for('reaction_add',timeout=5, check=check)
+                    if(reaction.emoji == "\N{THUMBS UP SIGN}"):
+                        await message.channel.send("Creating role.......")
+                        permissions = discord.Permissions(send_messages = True, read_messages = True, add_reactions = True, connect = True,
+                        speak = True, stream = True, use_external_emojis = True, view_channel = True)
+                        guild.create_role(name = str(arg), permissions = permissions)
+                        serversAndMembers.update({str(message.guild.name): str(arg)})
+                        await message.channel.send(f"Verify role set to {arg}")
+                        with open("servers.json", "w") as f:
+                            json.dump(serversAndMembers, f)
+                    elif(reaction.emoji == "\N{THUMBS DOWN SIGN}"):
+                        await message.channel.send("Cancelling....")
+                except asyncio.TimeoutError:
+                    await message.channel.send("You took to much time.")
+            # else:
+            #     await message.add_reaction("THUMBSUP")
+            #     await message.add_reaction("THUMBSDOWN")
+            #     reaction = await Bot.wait_for_reaction(["THUMBSUP", "THUMBSDOWN"], timeout = 60.0)
+            #     if(reaction == "THUMBSUP"):
+            #         await message.channel.send("Creating role.......")
+            #         guild = discord.Guild
+            #         guild.create_role(name = str(arg), permissions = "")
+            #         serversAndMembers.update({str(message.guild.name): str(arg)})
+            #         await message.channel.send(f"Verify role set to {arg}")
+            #         with open("servers.json", "w") as f:
+            #             json.dump(serversAndMembers, f)
+            #     elif(reaction == "THUMBSDOWN"):
+            #         await message.channel.send("Cancelling....")
+
     else:
-            serversAndMembers[str(message.guild.name)] = str(arg)
+        roles = await guild.fetch_roles()
+        role = discord.utils.get(message.guild.roles, name = str(arg))
+        if(str(arg in roles)):
+            await message.channel.send("This role is not present in the server, do you want me to create it?")
+            serversAndMembers.update({str(message.guild.name): str(arg)})
+            await message.channel.send(f"Verify role set to {arg}")
+            with open("servers.json", "w") as f:
+                json.dump(serversAndMembers, f)
+        else:
+            await message.add_reaction("THUMBSUP")
+            await message.add_reaction("THUMBSDOWN")
+            reaction = await client.wait_for_reaction(["THUMBSUP", "THUMBSDOWN"])
+            if(reaction == "THUMBSUP"):
+                await message.channel.send("Creating role.......")
+                guild = discord.Guild
+                guild.create_role(name = str(arg))
+                serversAndMembers.update({str(message.guild.name): str(arg)})
+                await message.channel.send(f"Verify role set to {arg}")
+                with open("servers.json", "w") as f:
+                    json.dump(serversAndMembers, f)
+            elif(reaction == "THUMBSDOWN"):
+                await message.chnnel.send("Cancelling....")
 
 @client.command()
 async def say(ctx, * , text):
-    '''
-    Echos what you say
-    '''
     if(str(ctx.author.id) == str(owner)):
         await ctx.message.delete()
         await ctx.send(f"{text}")
